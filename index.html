@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lab Exam Console</title>
+  <link rel="stylesheet" href="vendor/codemirror/codemirror.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div id="app"></div>
+  <div id="toast" role="status"></div>
+  <noscript><p>This exam needs JavaScript in desktop Chrome or Edge.</p></noscript>
+  <script>
+    // Chrome and Edge refuse the app's modules on file://, which leaves a blank page.
+    if (location.protocol === "file:") {
+      var card = document.createElement("section");
+      card.className = "card message-card";
+      var title = document.createElement("h1");
+      title.textContent = "Open this exam through a web server";
+      var text = document.createElement("p");
+      text.textContent = "This page was opened as a file, so it cannot start Python. Run npm run serve in the project folder and open http://127.0.0.1:8000/lab-exam/, or use the published exam link.";
+      card.append(title, text);
+      var main = document.createElement("main");
+      main.className = "gate";
+      main.append(card);
+      document.getElementById("app").append(main);
+    }
+  </script>
+  <script src="vendor/codemirror/codemirror.js"></script>
+  <script src="vendor/codemirror/python.js"></script>
+  <script src="vendor/codemirror/matchbrackets.js"></script>
+  <script src="vendor/jspdf/jspdf.umd.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

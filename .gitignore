@@ -1,0 +1,4 @@
+private/
+node_modules/
+*.local
+GROK_PROMPT.md
