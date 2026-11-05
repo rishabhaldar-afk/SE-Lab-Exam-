@@ -59,7 +59,7 @@ export function downloadReport(filename, dataUri) {
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
-export function mountReceipt(parent, { receipt, details = {}, onDownload, onSignOut = null }) {
+export function mountReceipt(parent, { receipt, details = {}, onDownload, onBack = null }) {
   const button = el("button", { type: "button", class: "primary block" }, ["Download report again"]);
   button.addEventListener("click", onDownload);
   const rows = [
@@ -81,11 +81,11 @@ export function mountReceipt(parent, { receipt, details = {}, onDownload, onSign
         : null,
       rows.length ? el("dl", { class: "receipt-meta" }, rows.flatMap(([term, value]) => [el("dt", {}, [term]), el("dd", {}, [value])])) : null,
       button,
-      onSignOut
-        ? el("button", { type: "button", class: "block signout", onclick: onSignOut }, ["Sign out of Google on this computer"])
-        : null,
-      el("p", { class: "receipt-note" }, ["Upload the downloaded PDF to the Google Form exactly as it is. Do not open it in an editor or save it again: the file is sealed, and any change is detected."]),
       el("p", { class: "field-hint center" }, ["If the PDF report did not download, use this button."]),
+      el("p", { class: "receipt-note" }, ["Upload the downloaded PDF to the Google Form exactly as it is. Do not open it in an editor or save it again: the file is sealed, and any change is detected."]),
+      onBack
+        ? el("button", { type: "button", class: "block back-main", onclick: onBack }, ["Back to main page"])
+        : null,
     ]),
     el("footer", { class: "foot" }, [
       el("button", { type: "button", class: "link", id: "invigilator-link" }, ["Invigilator"]),

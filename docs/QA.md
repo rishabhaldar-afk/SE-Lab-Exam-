@@ -111,7 +111,7 @@ Submit dialog now lists each diagram's shape count, warns on an empty diagram or
 | 90-minute exam | PASS. The gate shows "1 hr 30 min" and the timer starts at 1:29:58. |
 | New invigilator PIN | PASS. The old scaffold PIN gets "Incorrect PIN"; the new PIN opens the panel. |
 | Reopening the page after closing it | PASS. The gate asks for Google sign-in again; automatic sign-in is off (`auto_select: false` and `disableAutoSelect()`). The saved exam resumes after sign-in. |
-| "Sign out of Google on this computer" on the receipt | PASS for the button and its confirmation. The real sign-out page (`accounts.google.com/Logout`) was not opened. |
+| Receipt screen button | Replaced on 2026-11-05: "Sign out of Google on this computer" became "Back to main page", which returns to the sign-in page. |
 | Chrome "clear cookies when all windows are closed" with an exception for the exam site | NOT TESTED. Follow docs/GOOGLE_SETUP.md on one lab PC. |
 
 ## Sign-in button 2026-11-05
