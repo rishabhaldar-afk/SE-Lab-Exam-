@@ -4,7 +4,7 @@ import { classifyClient } from "../js/core/client-check.js";
 import { minorKey } from "../js/ui/lockdown-ui.js";
 import { isValidEmail, parseQuestionNumber, validateGate } from "../js/ui/gate.js";
 import { drawioUrl } from "../js/ui/uml-tab.js";
-import { createMemoryBackend, createStore, freshSession, parseSession, remainingMs } from "../js/core/storage.js";
+import { createMemoryBackend, createStore, freshSession, parseSession, remainingMs, reopenSession } from "../js/core/storage.js";
 
 test("sessions round-trip and unknown versions are refused", () => {
   const backend = createMemoryBackend();
@@ -66,4 +66,35 @@ test("the gate requires a valid email and a question number from the paper", () 
   assert.equal(validateGate({ ...fields, question: "2.5" }, config), missing);
   assert.equal(parseQuestionNumber(" 25 ", 25), 25);
   assert.equal(parseQuestionNumber("1e1", 25), null);
+});
+
+test("reopening a mistaken submit keeps all work and remembers the old receipt", () => {
+  const session = {
+    ...freshSession({ name: "Ada", reg: "22BCE1", questionId: 4, now: 1000 }),
+    code: "print('kept')\n",
+    diagrams: ["<mxGraphModel>one</mxGraphModel>", "<mxGraphModel>two</mxGraphModel>"],
+    runs: [{ ts: "t", inputs: [], transcript: "kept", status: "ok" }],
+    runCount: 3,
+    eventLog: [{ type: "FS_EXIT" }],
+    violations: 1,
+    bonusMs: 60000,
+    submitted: true,
+    submittedAt: 5000,
+    receipt: "AAAA-BBBB-CCCC",
+    reportPdf: "data:application/pdf;base64,QQ==",
+    reportFilename: "x.pdf",
+    submission: { hash: "h" },
+    locked: true,
+  };
+  const open = reopenSession(session);
+  assert.equal(open.submitted, false);
+  assert.equal(open.receipt, null);
+  assert.equal(open.reportPdf, null);
+  assert.equal(open.locked, false);
+  assert.deepEqual(open.previousReceipts, ["AAAA-BBBB-CCCC"]);
+  for (const key of ["code", "diagrams", "runs", "runCount", "eventLog", "violations", "bonusMs", "startedAt", "questionId"]) {
+    assert.deepEqual(open[key], session[key], key);
+  }
+  const twice = reopenSession({ ...open, submitted: true, receipt: "DDDD-EEEE-FFFF" });
+  assert.deepEqual(twice.previousReceipts, ["AAAA-BBBB-CCCC", "DDDD-EEEE-FFFF"]);
 });

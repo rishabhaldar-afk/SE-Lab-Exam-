@@ -399,6 +399,9 @@ export function buildReportPdf(sealed, JsPDF, options = {}) {
   details([
     ["Incidents", `${payload.incidents}${payload.lockCount ? `  (session locked ${payload.lockCount} ${payload.lockCount === 1 ? "time" : "times"})` : ""}`],
     ["Recorded events", `${payload.majorEvents} major, ${payload.minorEvents} minor`],
+    ...(payload.previousReceipts?.length
+      ? [["Reopened", `${payload.previousReceipts.length} ${payload.previousReceipts.length === 1 ? "time" : "times"} by the invigilator; replaces ${payload.previousReceipts.join(", ")}`]]
+      : []),
     ...(payload.seb ? [["Browser", "Safe Exam Browser"]] : []),
   ]);
   y += 2;

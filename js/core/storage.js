@@ -127,3 +127,22 @@ export function freshSession({ name, email = "", reg, questionId, now }) {
     inputs: [],
   };
 }
+
+/**
+ * Reopen a submitted session after a mistaken submit. All work (code,
+ * diagrams, runs, event log) and the original start time are kept. The old
+ * receipt is remembered so the next report can show what it replaces.
+ */
+export function reopenSession(session) {
+  return {
+    ...session,
+    submitted: false,
+    submittedAt: null,
+    previousReceipts: (session.previousReceipts || []).concat(session.receipt ? [session.receipt] : []),
+    receipt: null,
+    reportPdf: null,
+    reportFilename: null,
+    submission: null,
+    locked: false,
+  };
+}

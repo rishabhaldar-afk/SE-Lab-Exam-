@@ -76,6 +76,9 @@ export function mountReceipt(parent, { receipt, details = {}, onDownload }) {
       el("p", { class: "muted" }, ["Write this receipt code on the attendance sheet and show it to the invigilator. Editing is closed."]),
       el("p", { class: "eyebrow" }, ["Receipt"]),
       el("p", { class: "receipt-code" }, [receipt || ""]),
+      details.previousReceipts?.length
+        ? el("p", { class: "receipt-note" }, [`This receipt replaces ${details.previousReceipts.join(", ")}. Cross out the old code on the attendance sheet and write this one.`])
+        : null,
       rows.length ? el("dl", { class: "receipt-meta" }, rows.flatMap(([term, value]) => [el("dt", {}, [term]), el("dd", {}, [value])])) : null,
       button,
       el("p", { class: "receipt-note" }, ["Upload the downloaded PDF to the Google Form exactly as it is. Do not open it in an editor or save it again: the file is sealed, and any change is detected."]),

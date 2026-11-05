@@ -83,7 +83,7 @@ At the start:
 - Students use desktop Chrome or Edge. Safari, phones, and tablets are blocked on the gate.
 - Each student keeps one tab. A second tab of the same URL shows "Exam already open in another tab" and does not start another session.
 
-During the exam the footer link **Invigilator**, or Ctrl+Alt+Shift+I, asks for the PIN. Actions: unlock, add minutes, force submit, correct a question number for a register number, show diagnostics. A corrected question number applies the next time that register number signs in, and the student's work is kept. Unlock sets the incident count back to zero. Every action is written into the event log. The PIN is a deterrent. Anyone who can read `config.js` can offline-test guesses against the hash.
+During the exam the footer link **Invigilator**, or Ctrl+Alt+Shift+I, asks for the PIN. Actions: unlock, add minutes, reopen a submitted exam, force submit, correct a question number for a register number, show diagnostics. **Reopen** is for a mistaken submit: it brings back all the work (diagrams, code, runs, event log), the timer continues from the original start (add minutes first if it has run out), and the next PDF states that it replaces the earlier receipt. The student then crosses out the old receipt on the attendance sheet and writes the new one. A corrected question number applies the next time that register number signs in, and the student's work is kept. Unlock sets the incident count back to zero. Every action is written into the event log. The PIN is a deterrent. Anyone who can read `config.js` can offline-test guesses against the hash.
 
 After the exam, collect the PDF reports and from a machine with this repository:
 

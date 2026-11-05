@@ -9,7 +9,7 @@ import {
   setScoring,
   unlockSession,
 } from "./core/lockdown-core.js";
-import { createStore, freshSession } from "./core/storage.js";
+import { createStore, freshSession, remainingMs, reopenSession } from "./core/storage.js";
 import { mountBlocked, mountGate, mountUnsupported, normalizeEmail, parseQuestionNumber, validateGate } from "./ui/gate.js";
 import { mountInvigilator } from "./ui/invigilator.js";
 import { attachHardening, startTabGuard } from "./ui/lockdown-ui.js";
@@ -51,8 +51,9 @@ const inv = mountInvigilator({
     toast("Session unlocked.");
   },
   addMinutes(minutes) {
-    if (!session || session.submitted) {
-      toast("No open session.");
+    // Allowed after a submit too, so time can be added before reopening.
+    if (!session) {
+      toast("No session on this computer.");
       return;
     }
     if (!Number.isInteger(minutes) || minutes < 1 || minutes > 180) {
@@ -63,6 +64,31 @@ const inv = mountInvigilator({
     if (lockdown) lockdown = logInvigilator(lockdown, Date.now(), `add-minutes ${minutes}`);
     persist(true);
     toast(`Added ${minutes} minutes.`);
+  },
+  reopen() {
+    if (!session?.submitted) {
+      toast("This exam is not submitted, so there is nothing to reopen.");
+      return;
+    }
+    const left = remainingMs(session.startedAt, Date.now(), CONFIG.EXAM_DURATION_MIN, CONFIG.EXAM_CLOSES_AT, session.bonusMs || 0);
+    if (left <= 0) {
+      toast("This student has no time left. Use Add minutes first, then reopen.");
+      return;
+    }
+    // Ask for fullscreen inside this click, before anything waits.
+    const fullscreen = client.seb ? Promise.resolve({ ok: true }) : requestFullscreenNow();
+    const previous = session.receipt || "none";
+    session = reopenSession(session);
+    lockdown = noteFullscreenTransition(setScoring(restoreLockdown(session), true), Date.now());
+    lockdown = logInvigilator(lockdown, Date.now(), `reopen after submit, previous receipt ${previous}`);
+    submitting = false;
+    inv.close();
+    openShell();
+    toast("Exam reopened. All work is kept, and the timer continues.");
+    fullscreen.then(async (result) => {
+      if (result.ok) await lockKeyboard();
+      else shell?.showOverlay("Fullscreen is needed to continue.", false);
+    });
   },
   forceSubmit() {
     if (!session || session.submitted) {
@@ -230,6 +256,7 @@ function showReceipt() {
       reg: session.reg,
       questionId: session.questionId,
       submittedAt: session.submittedAt,
+      previousReceipts: session.previousReceipts || [],
     },
     onDownload() {
       if (!session.reportPdf) {
@@ -327,6 +354,8 @@ async function onStart(fields) {
   }
   if (existing?.submitted) {
     session = existing;
+    // Not scoring, but present so invigilator actions on the receipt screen are logged.
+    lockdown = setScoring(restoreLockdown(session), false);
     showReceipt();
     return { ok: true };
   }
@@ -429,6 +458,7 @@ async function submit(reason) {
     emailVerified: Boolean(session.emailVerified),
     reg: session.reg,
     questionId: session.questionId,
+    previousReceipts: session.previousReceipts || [],
     startedAt: session.startedAt,
     submittedAt: Date.now(),
     code: session.code,

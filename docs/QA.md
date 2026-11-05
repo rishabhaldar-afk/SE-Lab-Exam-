@@ -96,3 +96,10 @@ Submit dialog now lists each diagram's shape count, warns on an empty diagram or
 | Opening and saving the PDF in Acrobat, Edge, or Chrome's "Save as PDF" | NOT TESTED. Expected `EDITED`, because any re-save rewrites the file. |
 | Google Form upload keeps the file unchanged | NOT TESTED. Google Forms stores uploads as the original file. Check one test upload with the verify tool. |
 | Apps Script upload | REMOVED. |
+
+## Reopen after a mistaken submit 2026-11-05
+
+| Check | Result |
+| --- | --- |
+| Submit, reopen with the invigilator PIN from the receipt screen, change the code, submit again | PASS in the browser pane. The diagram (2 shapes) and code came back, the timer continued from the original start, the new receipt screen said it replaces the first receipt, the PDF showed "Reopened: 1 time by the invigilator; replaces ...", and verify printed `OK`. |
+| Reopen when time is up | Refused with "Use Add minutes first". Add minutes now also works after a submit. Unit-tested via `remainingMs`; not clicked through in the browser. |

@@ -58,9 +58,12 @@ export function mountInvigilator(handlers) {
         row("Unlock session", "Removes the lock screen and resets the incident count.", [
           action("Unlock", () => handlers.unlock()),
         ]),
-        row("Add time", "Extends this student's timer.", [
+        row("Add time", "Extends this student's timer. Works after a submit too.", [
           minutes, el("span", { class: "muted" }, ["min"]),
           action("Add", () => handlers.addMinutes(Number(minutes.value))),
+        ]),
+        row("Reopen submitted exam", "For a mistaken submit. All work is kept and the timer continues. If time is up, add minutes first.", [
+          action("Reopen", () => handlers.reopen()),
         ]),
         row("Force submit", "Submits the exam now and downloads the report.", [
           action("Force submit", () => handlers.forceSubmit(), "danger"),

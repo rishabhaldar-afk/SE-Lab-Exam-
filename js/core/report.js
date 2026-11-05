@@ -80,6 +80,8 @@ export function createPayload(input) {
       pngError: diagram.pngError || null,
       cells: countDiagramCells(diagram.xml || ""),
     })),
+    // Receipts of earlier submits that the invigilator reopened. This report replaces them.
+    previousReceipts: (input.previousReceipts || []).slice(),
     incidents: input.incidents || 0,
     majorEvents: input.majorEvents || 0,
     minorEvents: input.minorEvents || 0,
