@@ -59,7 +59,7 @@ export function downloadReport(filename, dataUri) {
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
-export function mountReceipt(parent, { receipt, details = {}, onDownload }) {
+export function mountReceipt(parent, { receipt, details = {}, onDownload, onSignOut = null }) {
   const button = el("button", { type: "button", class: "primary block" }, ["Download report again"]);
   button.addEventListener("click", onDownload);
   const rows = [
@@ -81,6 +81,9 @@ export function mountReceipt(parent, { receipt, details = {}, onDownload }) {
         : null,
       rows.length ? el("dl", { class: "receipt-meta" }, rows.flatMap(([term, value]) => [el("dt", {}, [term]), el("dd", {}, [value])])) : null,
       button,
+      onSignOut
+        ? el("button", { type: "button", class: "block signout", onclick: onSignOut }, ["Sign out of Google on this computer"])
+        : null,
       el("p", { class: "receipt-note" }, ["Upload the downloaded PDF to the Google Form exactly as it is. Do not open it in an editor or save it again: the file is sealed, and any change is detected."]),
       el("p", { class: "field-hint center" }, ["If the PDF report did not download, use this button."]),
     ]),

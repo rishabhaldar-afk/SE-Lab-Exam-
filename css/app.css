@@ -290,6 +290,7 @@ input.upper::placeholder { text-transform: none; }
   font-size: 0.9rem;
 }
 .receipt-meta dt { color: var(--muted); }
+.receipt-card .signout { margin-top: 0.6rem; }
 .receipt-note {
   margin: 0 0 1rem !important;
   padding: 0.6rem 0.8rem;

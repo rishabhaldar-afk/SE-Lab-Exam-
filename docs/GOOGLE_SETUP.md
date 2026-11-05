@@ -13,6 +13,19 @@ To use the exam from another address, add it in Google Cloud Console under the c
 
 If the Cloud project's app is **External**, set it to **In production** (Audience → Publish app); in **Testing**, only listed test users can sign in. To turn Google sign-in off, set `GOOGLE_CLIENT_ID` to `""`; students then type name and email.
 
+## Part 1b. Sign students out of Google on lab PCs
+
+The exam never keeps a sign-in: each time the page opens, the student must sign in again, and Google's automatic sign-in is turned off. But Chrome itself stays signed in to the student's Google account until it is signed out, and a web page cannot do that when a tab closes. On shared lab PCs:
+
+- **After submitting**, the receipt screen has **Sign out of Google on this computer**. Students click it after downloading the PDF and noting the receipt.
+- **Automatically, whenever Chrome closes** (once per lab PC, about a minute):
+  1. In Chrome, open `chrome://settings/content/siteData` (Settings → Privacy and security → Third-party cookies or Site data).
+  2. Turn on **Clear cookies and site data when you close all windows** (on some versions: **Delete data that sites have saved to your device when you close all windows**).
+  3. Under **Allowed to save data on your device** (or **Sites that can always use cookies**), click **Add** and enter `https://rishabhaldar-afk.github.io`. This keeps the exam's saved work, so a student whose browser closes by accident can sign in again and resume.
+  4. In Edge, the same setting is under Settings → Privacy, search, and services → **Choose what to clear every time you close the browser** → **Cookies and other site data**, with the exam site added under **Don't clear**.
+
+  With this on, closing all Chrome windows signs every Google account out of that PC. Closing just one tab does not; the receipt button covers that case.
+
 ## Part 2. The Google Form
 
 1. Open <https://forms.google.com/> and create a form, for example "Lab exam submission".

@@ -246,6 +246,14 @@ function showBlocked() {
   mountBlocked(root);
 }
 
+/** Sign every Google account out of this browser. The submitted exam stays saved on this PC. */
+function signOutOfGoogle() {
+  const ready = window.confirm("Have you downloaded the PDF and written the receipt code on the attendance sheet?\n\nSigning out leaves this page and signs this browser out of Google.");
+  if (!ready) return;
+  window.google?.accounts?.id?.disableAutoSelect?.();
+  location.href = "https://accounts.google.com/Logout";
+}
+
 function showReceipt() {
   document.body.classList.remove("is-exam");
   mountReceipt(root, {
@@ -258,6 +266,9 @@ function showReceipt() {
       submittedAt: session.submittedAt,
       previousReceipts: session.previousReceipts || [],
     },
+    // Google sign-out ends the Google session in this browser, so the next student
+    // cannot use this one. Download the PDF and note the receipt first.
+    onSignOut: CONFIG.GOOGLE_CLIENT_ID ? signOutOfGoogle : null,
     onDownload() {
       if (!session.reportPdf) {
         toast("The report file is no longer in this browser. Ask the invigilator.");

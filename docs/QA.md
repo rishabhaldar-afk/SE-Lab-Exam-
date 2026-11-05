@@ -45,7 +45,7 @@ Checked on 2026-11-02 on Windows, Node v24, PowerShell. Headless Chrome rendered
 
 Application modules do not assign student text to an HTML parser. The report is a PDF: student text is drawn as PDF text with the built-in fonts, and the submission JSON is embedded as base64, so it cannot run in the teacher's viewer. A one-character change in the hashed payload fails verification.
 
-The public scaffold still uses the PIN `lab-invigilator`. Replace it before a published exam. Earlier commits in this repository still contain `data/questions.json`; publish from a repository without that history if the question text must stay private.
+The scaffold PIN was replaced on 2026-11-05; only its hash is in `config.js`. Earlier commits in this repository still contain `data/questions.json`; publish from a repository without that history if the question text must stay private.
 
 ## UI pass 2026-11-03
 
@@ -103,3 +103,13 @@ Submit dialog now lists each diagram's shape count, warns on an empty diagram or
 | --- | --- |
 | Submit, reopen with the invigilator PIN from the receipt screen, change the code, submit again | PASS in the browser pane. The diagram (2 shapes) and code came back, the timer continued from the original start, the new receipt screen said it replaces the first receipt, the PDF showed "Reopened: 1 time by the invigilator; replaces ...", and verify printed `OK`. |
 | Reopen when time is up | Refused with "Use Add minutes first". Add minutes now also works after a submit. Unit-tested via `remainingMs`; not clicked through in the browser. |
+
+## Duration, PIN, and sign-out 2026-11-05
+
+| Check | Result |
+| --- | --- |
+| 90-minute exam | PASS. The gate shows "1 hr 30 min" and the timer starts at 1:29:58. |
+| New invigilator PIN | PASS. The old scaffold PIN gets "Incorrect PIN"; the new PIN opens the panel. |
+| Reopening the page after closing it | PASS. The gate asks for Google sign-in again; automatic sign-in is off (`auto_select: false` and `disableAutoSelect()`). The saved exam resumes after sign-in. |
+| "Sign out of Google on this computer" on the receipt | PASS for the button and its confirmation. The real sign-out page (`accounts.google.com/Logout`) was not opened. |
+| Chrome "clear cookies when all windows are closed" with an exception for the exam site | NOT TESTED. Follow docs/GOOGLE_SETUP.md on one lab PC. |

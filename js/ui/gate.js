@@ -1,6 +1,7 @@
 import { el } from "./dom.js";
 import { isValidReg, normalizeReg } from "../core/assign.js";
 import { decodeIdToken, identityFromClaims } from "../core/google-id.js";
+import { formatDuration } from "../core/report-pdf.js";
 
 const GIS_SRC = "https://accounts.google.com/gsi/client";
 let gisLoading = null;
@@ -48,6 +49,8 @@ function mountGoogleSignIn(config, onChange) {
         cancel_on_tap_outside: true,
         ux_mode: "popup",
       });
+      // Never sign a student in silently: on a shared lab PC the last person's account may still be in the browser.
+      window.google.accounts.id.disableAutoSelect();
       window.google.accounts.id.renderButton(target, { theme: "outline", size: "large", text: "signin_with", width: 300 });
     }).catch(() => {
       status.hidden = false;
@@ -214,7 +217,7 @@ export function mountGate(parent, { config, client, onStart }) {
       el("section", { class: "card gate-info" }, [
         el("h2", {}, ["Before you start"]),
         el("dl", { class: "facts" }, [
-          fact("Duration", `${config.EXAM_DURATION_MIN} min`),
+          fact("Duration", formatDuration(config.EXAM_DURATION_MIN * 60000)),
           fact("Part A", "2 UML diagrams"),
           fact("Part B", "Python program"),
           fact("Locks after", `${config.MAX_VIOLATIONS} incidents`),

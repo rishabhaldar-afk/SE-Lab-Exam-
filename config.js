@@ -4,7 +4,7 @@ export const CONFIG = {
   EXAM_TITLE: "Software Engineering Lab Exam",
   COURSE: "Software Engineering",
   /** Length of a sitting, in minutes. The clock starts at the first successful gate entry. */
-  EXAM_DURATION_MIN: 120,
+  EXAM_DURATION_MIN: 90,
   /** Optional absolute close time as an ISO string, or null. The earlier deadline wins. */
   EXAM_CLOSES_AT: null,
   /** Counted incidents before the screen locks for the invigilator. */
@@ -15,14 +15,14 @@ export const CONFIG = {
    */
   QUESTION_COUNT: 25,
   /**
-   * PBKDF2-SHA256 of the invigilator PIN. The scaffold PIN is lab-invigilator.
-   * Replace this with the output of tools/make-hash.mjs before a real exam.
+   * PBKDF2-SHA256 of the invigilator PIN, set 2026-11-05. The PIN itself is
+   * not stored anywhere. To change it, paste the output of tools/make-hash.mjs.
    */
   INVIGILATOR_PIN_HASH: {
     kdf: "PBKDF2-SHA256",
     iter: 310000,
-    salt: "VFsxc8pFiY6/Qt3cIm/s2A==",
-    hash: "f98b9096f95ff017c89204f1628dcbbee8f305c11c31c49c995fcae24bf622f0",
+    salt: "DmNpOOHFk0Qcf4r/ByMhxQ==",
+    hash: "05f4f854f956af8d963e77c00327e63c008b36821c8e65ef492a6f1b2fa928fc",
   },
   /** Wall-clock limit for one continuous Python run. */
   RUN_TIMEOUT_MS: 5000,

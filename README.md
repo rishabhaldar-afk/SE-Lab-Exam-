@@ -8,7 +8,7 @@ Students sign in with their college Google account, download a sealed PDF, and u
 
 ## Before a real exam
 
-1. Replace `INVIGILATOR_PIN_HASH` in `config.js` with the output of `node tools/make-hash.mjs`. The scaffold PIN `lab-invigilator` is public.
+1. The invigilator PIN was set on 2026-11-05; `config.js` holds only its hash. To change it, run `node tools/make-hash.mjs` and paste the output over `INVIGILATOR_PIN_HASH`.
 2. Set `QUESTION_COUNT` to the highest question number on your papers.
 3. Create the Google Form and prepare an attendance sheet with a column for the receipt code. See [docs/GOOGLE_SETUP.md](docs/GOOGLE_SETUP.md).
 4. Print the question papers. Students type their question number at sign-in, so make it easy to see on each paper.
@@ -34,11 +34,11 @@ Edit `config.js`. Each field is commented there.
 | Field | Scaffold value | Meaning |
 | --- | --- | --- |
 | `EXAM_TITLE`, `COURSE` | Software Engineering Lab Exam | Shown on the gate |
-| `EXAM_DURATION_MIN` | 120 | Clock length from the first successful start |
+| `EXAM_DURATION_MIN` | 90 | Clock length from the first successful start (1 hr 30 min) |
 | `EXAM_CLOSES_AT` | `null` | Optional ISO close time. The earlier of this and the duration ends the exam |
 | `MAX_VIOLATIONS` | 3 | Counted incidents before the screen locks |
 | `QUESTION_COUNT` | 25 | Highest question number a student can enter |
-| `INVIGILATOR_PIN_HASH` | hash of `lab-invigilator` | Replace before a real exam |
+| `INVIGILATOR_PIN_HASH` | PBKDF2 hash | Invigilator PIN. Only the hash is stored |
 | `RUN_TIMEOUT_MS` | 5000 | One continuous Python run |
 | `OUTPUT_LIMIT_BYTES` | 200000 | Then the run is stopped |
 | `GOOGLE_CLIENT_ID` | empty | Google sign-in. Empty: students type name and email |
