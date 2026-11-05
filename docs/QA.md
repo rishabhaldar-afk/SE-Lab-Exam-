@@ -113,3 +113,12 @@ Submit dialog now lists each diagram's shape count, warns on an empty diagram or
 | Reopening the page after closing it | PASS. The gate asks for Google sign-in again; automatic sign-in is off (`auto_select: false` and `disableAutoSelect()`). The saved exam resumes after sign-in. |
 | "Sign out of Google on this computer" on the receipt | PASS for the button and its confirmation. The real sign-out page (`accounts.google.com/Logout`) was not opened. |
 | Chrome "clear cookies when all windows are closed" with an exception for the exam site | NOT TESTED. Follow docs/GOOGLE_SETUP.md on one lab PC. |
+
+## Sign-in button 2026-11-05
+
+| Check | Result |
+| --- | --- |
+| No "Sign in as <name>" button | PASS. Our own "Sign in with Google" button; Google's personalised button is not rendered. |
+| Every click opens the account chooser | PASS with a stand-in for Google: every request used `prompt: select_account`. With the real script, the token client loaded and the button enabled. |
+| Name and email from Google's userinfo; non-college account refused | PASS with a stand-in and in unit tests. |
+| Real chooser, consent, and sign-in with a college account | NOT TESTED. Needs the teacher's Google account. |

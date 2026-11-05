@@ -250,7 +250,6 @@ function showBlocked() {
 function signOutOfGoogle() {
   const ready = window.confirm("Have you downloaded the PDF and written the receipt code on the attendance sheet?\n\nSigning out leaves this page and signs this browser out of Google.");
   if (!ready) return;
-  window.google?.accounts?.id?.disableAutoSelect?.();
   location.href = "https://accounts.google.com/Logout";
 }
 

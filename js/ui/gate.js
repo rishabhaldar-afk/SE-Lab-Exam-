@@ -1,13 +1,13 @@
 import { el } from "./dom.js";
 import { isValidReg, normalizeReg } from "../core/assign.js";
-import { decodeIdToken, identityFromClaims } from "../core/google-id.js";
+import { fetchGoogleIdentity } from "../core/google-id.js";
 import { formatDuration } from "../core/report-pdf.js";
 
 const GIS_SRC = "https://accounts.google.com/gsi/client";
 let gisLoading = null;
 
 function loadGis() {
-  if (window.google?.accounts?.id) return Promise.resolve();
+  if (window.google?.accounts?.oauth2) return Promise.resolve();
   if (!gisLoading) {
     gisLoading = new Promise((resolve, reject) => {
       const script = document.createElement("script");
@@ -27,55 +27,45 @@ function loadGis() {
 /**
  * Google sign-in panel. Calls onChange({ name, email, credential }) after a
  * good sign-in and onChange(null) after "Use a different account".
+ *
+ * The button is our own, not Google's personalised one, and every click opens
+ * Google's account chooser (prompt: select_account). On a shared lab PC the
+ * previous student's account may still be signed in to the browser; it must
+ * never be one click away.
  */
 function mountGoogleSignIn(config, onChange) {
   const box = el("div", { class: "google-box" });
   const status = el("p", { class: "google-error", role: "alert" });
   status.hidden = true;
-  const target = el("div", { class: "google-button" });
+  const button = el("button", { type: "button", class: "google-signin" }, [
+    el("span", { class: "google-g", "aria-hidden": "true" }, ["G"]),
+    "Sign in with Google",
+  ]);
+  let tokenClient = null;
 
-  function showButton() {
-    box.replaceChildren(
-      el("p", { class: "google-lede" }, [`Sign in with your ${config.GOOGLE_ALLOWED_DOMAIN || "Google"} account to fill in your name and email.`]),
-      target,
-      status,
-    );
-    loadGis().then(() => {
-      window.google.accounts.id.initialize({
-        client_id: config.GOOGLE_CLIENT_ID,
-        callback: onCredential,
-        hd: config.GOOGLE_ALLOWED_DOMAIN || undefined,
-        auto_select: false,
-        cancel_on_tap_outside: true,
-        ux_mode: "popup",
-      });
-      // Never sign a student in silently: on a shared lab PC the last person's account may still be in the browser.
-      window.google.accounts.id.disableAutoSelect();
-      window.google.accounts.id.renderButton(target, { theme: "outline", size: "large", text: "signin_with", width: 300 });
-    }).catch(() => {
-      status.hidden = false;
-      status.textContent = "Google sign-in could not load. Check the internet connection, then reload the page.";
-    });
+  function fail(message) {
+    status.hidden = false;
+    status.textContent = message;
+    button.disabled = false;
   }
 
-  function onCredential(response) {
+  async function onToken(response) {
+    if (!response || response.error || !response.access_token) {
+      fail(response?.error === "access_denied" ? "Sign-in was cancelled. Try again." : "Google sign-in failed. Try again.");
+      return;
+    }
     let who;
     try {
-      who = identityFromClaims(decodeIdToken(response?.credential), {
-        clientId: config.GOOGLE_CLIENT_ID,
-        domain: config.GOOGLE_ALLOWED_DOMAIN,
-      });
-    } catch {
-      who = { error: "Google sign-in failed. Try again." };
+      who = await fetchGoogleIdentity(response.access_token, { domain: config.GOOGLE_ALLOWED_DOMAIN });
+    } catch (error) {
+      who = { error: error.message };
     }
     if (who.error) {
-      status.hidden = false;
-      status.textContent = who.error;
+      fail(who.error);
       return;
     }
     const other = el("button", { type: "button", class: "link" }, ["Use a different account"]);
     other.addEventListener("click", () => {
-      window.google?.accounts?.id?.disableAutoSelect?.();
       onChange(null);
       showButton();
     });
@@ -84,8 +74,38 @@ function mountGoogleSignIn(config, onChange) {
       el("div", {}, [el("strong", {}, [who.name]), el("span", {}, [who.email])]),
       other,
     ]));
-    onChange({ name: who.name, email: who.email, credential: response.credential });
+    onChange({ name: who.name, email: who.email, credential: "google-userinfo" });
   }
+
+  function showButton() {
+    status.hidden = true;
+    button.disabled = true;
+    box.replaceChildren(
+      el("p", { class: "google-lede" }, [`Sign in with your ${config.GOOGLE_ALLOWED_DOMAIN || "Google"} account to fill in your name and email.`]),
+      button,
+      status,
+    );
+    loadGis().then(() => {
+      tokenClient = window.google.accounts.oauth2.initTokenClient({
+        client_id: config.GOOGLE_CLIENT_ID,
+        scope: "openid email profile",
+        prompt: "select_account",
+        hosted_domain: config.GOOGLE_ALLOWED_DOMAIN || undefined,
+        callback: onToken,
+        error_callback: (error) => fail(error?.type === "popup_closed"
+          ? "The Google window was closed. Click Sign in with Google again."
+          : "The Google window could not open. Allow pop-ups for this page and try again."),
+      });
+      button.disabled = false;
+    }).catch(() => fail("Google sign-in could not load. Check the internet connection, then reload the page."));
+  }
+
+  button.addEventListener("click", () => {
+    if (!tokenClient) return;
+    status.hidden = true;
+    button.disabled = true;
+    tokenClient.requestAccessToken({ prompt: "select_account" });
+  });
 
   showButton();
   return box;

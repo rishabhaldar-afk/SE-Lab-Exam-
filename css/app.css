@@ -233,6 +233,27 @@ input.upper::placeholder { text-transform: none; }
 }
 .google-signed > div { display: grid; flex: 1 1 auto; min-width: 0; line-height: 1.3; }
 .google-signed > div span { font-size: 0.82rem; color: var(--muted); overflow-wrap: anywhere; }
+.google-signin {
+  width: 100%;
+  max-width: 20rem;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid #c3ccd8;
+  background: #fff;
+  font-size: 0.95rem;
+}
+.google-g {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
 .google-mark {
   width: 2rem;
   height: 2rem;
